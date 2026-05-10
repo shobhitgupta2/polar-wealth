@@ -77,6 +77,7 @@ The `.web.tsx` variant handles Next.js-style static rendering where the color sc
 ### React Compiler Disabled
 
 The React Compiler experiment is off (`experiments.reactCompiler: false`). Instead, manual memoization is used where appropriate:
+
 - `React.memo` on pure presentational components
 - `useMemo` for derived data (filtered lists, formatted values)
 - `useCallback` for stable event handler references
@@ -95,13 +96,17 @@ The React Compiler experiment is off (`experiments.reactCompiler: false`). Inste
 General-purpose data fetching with automatic lifecycle management.
 
 ```typescript
-const { data, isLoading, isError, refetch, abort } = useFetch<User[]>("/api/users", {
-  skip: !session,
-  deps: [sessionId],
-});
+const { data, isLoading, isError, refetch, abort } = useFetch<User[]>(
+  "/api/users",
+  {
+    skip: !session,
+    deps: [sessionId],
+  },
+);
 ```
 
 **Features:**
+
 - **Abort on unmount/url change** — `AbortController` cancels in-flight requests to prevent stale state updates
 - **Status machine** — `idle | loading | success | error` with derived booleans
 - **Skip** — conditionally disable the request without unmounting
@@ -109,6 +114,7 @@ const { data, isLoading, isError, refetch, abort } = useFetch<User[]>("/api/user
 - **Stable options** — `fetchOptionsRef` holds fetch config, avoiding re-effect-triggering from option object recreation
 
 **Returns:**
+
 - `data: T | null` — parsed JSON or text response
 - `error: Error | null` — network/parse errors
 - `isLoading`, `isError`, `isSuccess` — boolean status flags
@@ -133,11 +139,11 @@ trackCTA("Execute Strategy", "AI Strategy Banner");
 
 **Events:**
 
-| Event | Params | Trigger |
-|-------|--------|---------|
-| `page_view` | `page_path`, `page_title` | Route changes via `PageTracker` |
-| `search` | `search_term`, `search_target` | Search interactions |
-| `cta_click` | `cta_name`, `cta_location` | Button/CTA presses |
+| Event       | Params                         | Trigger                         |
+| ----------- | ------------------------------ | ------------------------------- |
+| `page_view` | `page_path`, `page_title`      | Route changes via `PageTracker` |
+| `search`    | `search_term`, `search_target` | Search interactions             |
+| `cta_click` | `cta_name`, `cta_location`     | Button/CTA presses              |
 
 **Environment variables required:**
 
@@ -190,7 +196,10 @@ const text = useThemeColor({ light: "#000", dark: "#fff" }, "text");
 Persistent key-value storage backed by `localStorage` on web. Gracefully no-ops on native (returns `defaultValue`). Handles JSON serialization automatically.
 
 ```typescript
-const { value, setValue, removeValue } = useLocalStorage<string>("theme", "light");
+const { value, setValue, removeValue } = useLocalStorage<string>(
+  "theme",
+  "light",
+);
 
 // Persisted across sessions — survives page reload and browser restart
 setValue("dark");
@@ -198,6 +207,7 @@ removeValue();
 ```
 
 **Features:**
+
 - **SSR-safe** — returns `defaultValue` on first render, hydrates the real stored value in `useEffect` (avoids hydration mismatch)
 - **Generic type** — any serializable value (`string`, `number`, `object`, `array`)
 - **JSON serialization** — objects are stored as JSON strings automatically
@@ -205,6 +215,7 @@ removeValue();
 - **Stable callbacks** — `setValue` and `removeValue` are `useCallback`-wrapped for stable reference
 
 **Returns:**
+
 - `value: T` — current stored value (or `defaultValue` before hydration)
 - `setValue: (value: T) => void` — persist a new value
 - `removeValue: () => void` — remove the key and reset to `defaultValue`
@@ -271,7 +282,10 @@ Every route can export a `<Head>` component via expo-router's `Head` module. The
 ```tsx
 <Head>
   <title>Polar Finance — Wealth Curator</title>
-  <meta name="description" content="Personal finance dashboard with AI-driven insights..." />
+  <meta
+    name="description"
+    content="Personal finance dashboard with AI-driven insights..."
+  />
   <meta property="og:title" content="Polar Finance — Wealth Curator" />
   <meta property="og:description" content="..." />
   <meta property="og:type" content="website" />
@@ -323,8 +337,10 @@ EXPO_PUBLIC_GA4_API_SECRET=xxxxxxxxxxxx
 The `useLocalStorage` hook manages the GA4 client ID:
 
 ```typescript
-const { value: clientId, setValue: setClientId } =
-  useLocalStorage<string>("ga4_client_id", "");
+const { value: clientId, setValue: setClientId } = useLocalStorage<string>(
+  "ga4_client_id",
+  "",
+);
 
 useEffect(() => {
   if (!clientId) setClientId(generateClientId());
@@ -339,7 +355,11 @@ On first load, a UUID-style ID is generated and persisted to `localStorage`. On 
 
 ```typescript
 useEffect(() => {
-  const titles: Record<string, string> = { "/": "Dashboard", "/insights": "Insights", "/budgets": "Budgets" };
+  const titles: Record<string, string> = {
+    "/": "Dashboard",
+    "/insights": "Insights",
+    "/budgets": "Budgets",
+  };
   trackPageView(pathname, titles[pathname] ?? pathname);
 }, [pathname, trackPageView]);
 ```
@@ -362,42 +382,27 @@ To route through Google Tag Manager instead of direct GA4 Measurement Protocol, 
 
 ### Color Tokens (Dark Mode)
 
-| Token | Hex | Usage |
-|-------|-----|-------|
-| `primary` | `#0058be` | Actions, active states |
-| `success` | `#10b981` | Positive deltas, cleared |
-| `error` | `#ba1a1a` | Alerts, critical budget |
-| `warning` | `#924700` | Tertiary/gold, warning state |
-| `surfaceContainer` | `#334155` | Card backgrounds |
-| `background` | `#0F172A` | Page background |
+| Token              | Hex       | Usage                        |
+| ------------------ | --------- | ---------------------------- |
+| `primary`          | `#0058be` | Actions, active states       |
+| `success`          | `#10b981` | Positive deltas, cleared     |
+| `error`            | `#ba1a1a` | Alerts, critical budget      |
+| `warning`          | `#924700` | Tertiary/gold, warning state |
+| `surfaceContainer` | `#334155` | Card backgrounds             |
+| `background`       | `#0F172A` | Page background              |
 
 ### Typography
 
-| Style | Size / Line Height | Weight | Usage |
-|-------|---------------------|--------|-------|
-| `displayMD` | 44px / 44px | 700 | Hero numbers (net worth) |
-| `headlineSM` | 24px / 32px | 600 | Section titles |
-| `titleMD` | 18px / 24px | 600 | Card headers |
-| `bodyMD` | 14px / 20px | 400 | Body copy |
-| `labelSM` | 11px / 14px | 500 | Tags, status chips |
+| Style        | Size / Line Height | Weight | Usage                    |
+| ------------ | ------------------ | ------ | ------------------------ |
+| `displayMD`  | 44px / 44px        | 700    | Hero numbers (net worth) |
+| `headlineSM` | 24px / 32px        | 600    | Section titles           |
+| `titleMD`    | 18px / 24px        | 600    | Card headers             |
+| `bodyMD`     | 14px / 20px        | 400    | Body copy                |
+| `labelSM`    | 11px / 14px        | 500    | Tags, status chips       |
 
 ### Status Badges
 
 Pill chips use color-coded variants: `FIXED`, `CRITICAL`, `HEALTHY`, `OPTIMAL`, `CLEARED`, `PENDING`.
 
 Budget progress bars: **green** (healthy <70%), **amber** (warning 70–89%), **red** (critical 90%+).
-
----
-
-## Mock Data Strategy
-
-All financial data comes from local fixtures in `constants/data.ts`. Types are exported alongside data so components consume fully-typed objects. No network calls are made for chart data, transaction lists, or budget categories.
-
-```typescript
-// constants/data.ts
-export const budgetCategories: BudgetCategory[] = [ ... ]
-export const dashboardSummary: SummaryItem[] = [ ... ]
-export const aiStrategy: AIStrategy = { ... }
-```
-
-Replace fixture imports with `useFetch` calls when a real API is available — the hook's return shape is identical to what the fixtures currently provide.
